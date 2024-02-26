@@ -1,35 +1,34 @@
-import { useEffect, useState } from "react";
-import {Product} from "../models/product";
+import { useState } from "react";
+import { Container, CssBaseline, ThemeProvider, createTheme } from "@mui/material";
+import Header from "./Header";
+import { Outlet } from "react-router-dom";
+
 
 function App() {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [darkMode, setDarkMode] = useState(false);
+  const palleteType = darkMode ? 'dark' : 'light';
+ const theme = createTheme({
+  palette: {
+    mode: palleteType,
+    background: { 
+     default: palleteType === 'light' ? '#eaeaea' : '#121212'
+  }
+  }
+ })
 
-  useEffect(() =>{
-    fetch('http://localhost:5256/api/products')
-    .then(response => response.json())
-    .then(data => setProducts(data))
-  }, [])
+ function handleThemeChange() {
+  setDarkMode(!darkMode);
+ }
 
-function addProducts(){
-  setProducts(prevState => [...prevState,
-     {
-      id: prevState.length +101,
-      name:'product' + (prevState.length+1), 
-      price: 300.00,
-      brand: 'some brand',
-      description: 'some description',
-      pictureUrl: 'http://picsum.photos/200',
-    }])
-}
 
   return (
-    <div>
-     <h1>Re-Store</h1>
-       <ul>{products.map((product) => (
-    <li key={product.id}> {product.name} - {product.price}</li>
-  ))}</ul>
-  <button onClick={addProducts}>Add Products</button>
-    </div>
+    <ThemeProvider theme={theme}>
+    <CssBaseline/>
+     <Header darkMode={darkMode} handleThemeChange={handleThemeChange}/>
+     <Container>
+     <Outlet/>
+     </Container>   
+      </ThemeProvider>
   )
 }
 
