@@ -24,7 +24,7 @@ namespace API.Extensions
 
             var lowerCaseSearchTerm = searchTerm.Trim().ToLower();
 
-            query = query.Where(p => p.Name.ToLower().Contains(searchTerm.ToLower()));
+            query = query.Where(p => p.Name.ToLower().Contains(lowerCaseSearchTerm));
 
             return query;
         }
@@ -38,11 +38,11 @@ namespace API.Extensions
              brandList.AddRange(brands.ToLower().Split(",").ToList());
 
              if (!string.IsNullOrWhiteSpace(types))
-             brandList.AddRange(brands.ToLower().Split(",").ToList());
+             typeList.AddRange(types.ToLower().Split(",").ToList());
 
               query = query.Where(p => brandList.Count == 0 || brandList.Contains(p.Brand.ToLower()));
 
-             query = query.Where(p => brandList.Count == 0 || brandList.Contains(p.Type.ToLower()));
+             query = query.Where(p => typeList.Count == 0 || typeList.Contains(p.Type.ToLower()));
         
             return query;
         }

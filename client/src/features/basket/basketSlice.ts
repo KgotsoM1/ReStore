@@ -16,14 +16,15 @@ const initialState: BasketState = {
 
 export const fetchBasketAsync = createAsyncThunk<Basket>(
     'basket/fetchBasketAsync',
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    async (_) => {
+ 
+    async (_, thunkAPI) => {
         try {
             return await agent.Basket.get();
         } catch (error) {
-           console.log(error);
+           return thunkAPI.rejectWithValue({error: error})
         }
     },
+
     {
         condition: () => {
             if (!getCookie('buyerId')) return false;
@@ -72,19 +73,7 @@ export const basketSlice = createSlice({
         builder.addCase(removeBasketItemAsync.pending, (state, action) => {
             state.status = 'pendingRemoveItem' + action.meta.arg.productId + action.meta.arg.name;
         })
-        builder.addCase(removeBasketItemAsync.fulfilled, (state, action) => {
-            const { productId, quantity } = action.meta.arg;
-            const itemIndex = state.basket?.items.findIndex(i => i.productId === productId);
-            if (itemIndex === -1 || itemIndex === undefined) return;
-            state.basket!.items[itemIndex].quantity -= quantity;
-            if (state.basket?.items[itemIndex].quantity === 0)
-                state.basket.items.splice(itemIndex, 1);
-            state.status = 'idle';
-        });
-        builder.addCase(removeBasketItemAsync.rejected, (state, action) => {
-            state.status = 'idle';
-            console.log(action.payload);
-        });
+        
         builder.addMatcher(isAnyOf(addBasketItemAsync.fulfilled, fetchBasketAsync.fulfilled), (state, action) => {
             state.basket = action.payload;
             state.status = 'idle';

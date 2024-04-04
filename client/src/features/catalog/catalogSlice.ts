@@ -26,11 +26,26 @@ function initParams(): ProductParams {
     }
 }
 
-export const fetchProductsAsync = createAsyncThunk<Product[]>(
+function getAxiosParams(productParams: ProductParams) {
+    const params = new URLSearchParams();
+    params.append('pageNumber', productParams.pageNumber.toString());
+    params.append('pageSize', productParams.pageSize.toString());
+    params.append('orderBy', productParams.orderBy);
+    if (productParams.searchTerm) params.append('searchTerm', productParams.searchTerm);
+    if (productParams.types.length > 0) params.append('types', productParams.types.toString());
+    if (productParams.brands.length > 0) params.append('brands', productParams.brands.toString());
+    return params;
+}
+
+export const fetchProductsAsync = createAsyncThunk<Product[], void, { state: RootState }>(
     'catalog/fetchProductsAsync',
     async (_, thunkAPI) => {
+        const params = getAxiosParams(thunkAPI.getState().catalog.productParams);
         try {
-            return await agent.Catalog.list();
+            const response = await agent.Catalog.list(params);
+            thunkAPI.dispatch(setMetaData(response.metaData));
+
+            return response.items;
         } catch (error: unknown) { 
             console.error('Error fetching products:', error);
             return thunkAPI.rejectWithValue({ error: error });
@@ -80,7 +95,7 @@ export const catalogSlice = createSlice({
         },
         setPageNumber: (state, action: PayloadAction<Partial<ProductParams>>) => {
             state.productsLoaded = false;
-            state.productParams = { ...state.productParams, ...action.payload };
+            state.productParams = { ...state.productParams, ...action.payload, pageNumber: 1 };
         },
         setMetaData: (state, action: PayloadAction<MetaData | null>) => {
             state.metaData = action.payload;

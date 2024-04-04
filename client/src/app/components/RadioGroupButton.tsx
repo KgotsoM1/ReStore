@@ -1,12 +1,13 @@
-
 import { FormControl, RadioGroup, FormControlLabel, Radio } from "@mui/material";
 
+interface Option {
+    value: string;
+    label: string;
+}
 
 interface Props {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    options: any[];
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    onChange: (event: any) => void;
+    options: Option[];
+    onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
     selectedValue: string;
 }
 
@@ -18,7 +19,8 @@ export default function RadioButtonGroup({ options, onChange, selectedValue }: P
                     <FormControlLabel
                         value={value}
                         control={<Radio />}
-                        label={label} key={value}
+                        label={label} 
+                        key={value}
                     />
                 ))}
             </RadioGroup>

@@ -10,7 +10,8 @@ interface Props {
 export default function CheckboxButtons({ items, checked, onChange }: Props) {
     const [checkedItems, setCheckedItems] = useState(checked || []);
 
-    function handleChecked(value: string) {
+    function handleChecked(event: React.ChangeEvent<HTMLInputElement>) {
+        const value = event.target.name;
         const currentIndex = checkedItems.findIndex(item => item === value);
         let newChecked: string[] = [];
         if (currentIndex === -1) newChecked = [...checkedItems, value];
@@ -23,12 +24,13 @@ export default function CheckboxButtons({ items, checked, onChange }: Props) {
         <FormGroup>
             {items.map(item => (
                 <FormControlLabel
-                    key={item}
                     control={<Checkbox
                         checked={checkedItems.indexOf(item) !== -1}
-                        onClick={() => handleChecked(item)}
+                        onChange={handleChecked}
+                        name={item}
                     />}
-                    label={item} />
+                    label={item}
+                    key={item} />
             ))}
         </FormGroup>
     )
