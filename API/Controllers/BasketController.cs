@@ -26,17 +26,17 @@ public class BasketController : BaseApiController
     }
 
     [HttpPost]
-    public async Task<ActionResult> AddItemToBasket(int productId, int quantity = 1)
+    public async Task<ActionResult> AddItemToBasket(AddDeleteBasketDto addToBasketDto)
     {
         var basket = await RetrieveBasket(GetBuyerId());
 
         if (basket == null) basket = CreateBasket();
 
-        var product = await _context.Products.FindAsync(productId);
+        var product = await _context.Products.FindAsync(addToBasketDto.ProductId);
 
         if (product == null) return BadRequest(new ProblemDetails { Title = "Product not found" });
 
-        basket.AddItem(product, quantity);
+        basket.AddItem(product, addToBasketDto.Quantity);
 
         var result = await _context.SaveChangesAsync() > 0;
 

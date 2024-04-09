@@ -14,7 +14,9 @@ export default function Login() {
         mode: 'onTouched'
     });
 
+
     async function submitForm(data: FieldValues) {
+        console.table(data);
           try {
             await dispatch(signInUser(data));
             navigate(location.state?.from || '/catalog');

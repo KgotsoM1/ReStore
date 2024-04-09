@@ -16,8 +16,9 @@ const initialState: AccountState = {
 
 export const signInUser = createAsyncThunk<User, FieldValues>(
     'account/signInUser',
-    async ({ data }, thunkAPI) => {
+    async (data , thunkAPI) => {
         try {
+            console.log('Data', data);
             const userDto = await agent.Account.login(data);
             const {basket, ...user} = userDto;
             if (basket) thunkAPI.dispatch(setBasket(basket));

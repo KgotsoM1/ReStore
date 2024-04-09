@@ -26,6 +26,8 @@ public static class BasketExtensions
         };
     }
 
+    
+
     public static IQueryable<Basket> RetrieveBasketWithItems(this IQueryable<Basket> query, string buyerId)
     {
         return query
