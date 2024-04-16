@@ -15,7 +15,7 @@ export default function CheckoutWrapper() {
 
     useEffect(() => {
         agent.Payments.createPaymentIntent()
-            .then(response => dispatch(setBasket(response)))
+            .then(basket => dispatch(setBasket(basket)))
             .catch(error => console.log(error))
             .finally(() => setLoading(false))
     }, [dispatch]);
