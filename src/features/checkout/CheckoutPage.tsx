@@ -28,6 +28,17 @@ export default function CheckoutPage() {
     const stripe = useStripe();
     const elements = useElements();
 
+    function onCardInputChange(event: any) {
+        setCardState({
+            ...cardState,
+            elementError: {
+                ...cardState.elementError,
+                [event.elementType]: event.error?.message
+            }
+        })
+        setCardComplete({ ...cardComplete, [event.elementType]: event.complete })
+    }
+
     function getStepContent(step: number) {
         switch (step) {
             case 0:
@@ -40,18 +51,7 @@ export default function CheckoutPage() {
                 throw new Error('Unknown step');
         }
     }
-
-    function onCardInputChange(event: any) {
-        setCardState({
-            ...cardState,
-            elementError: {
-                ...cardState.elementError,
-                [event.elementType]: event.error?.message
-            }
-        })
-        setCardComplete({ ...cardComplete, [event.elementType]: event.complete })
-    }
-
+    
     const currentValidationSchema = validationSchema[activeStep];
 
     const methods = useForm({
