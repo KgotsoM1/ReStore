@@ -1,8 +1,8 @@
 import { Button, Grid, Typography } from "@mui/material";
-import BasketSummary from './basketSummery';
 import { Link } from 'react-router-dom';
 import { useAppSelector } from '../../app/store/configureStore';
 import BasketTable from './BasketTable';
+import BasketSummary from "./basketSummery";
 
 export default function BasketPage() {
     const { basket } = useAppSelector(state => state.basket);

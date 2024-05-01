@@ -49,7 +49,6 @@ export default function Catalog() {
 
   if (!filtersLoaded) return <LoadingComponent message="Loading product..." />;
 
-  console.log("Products ",products)
   return (
     <Grid container columnSpacing={4}>
       <Grid item xs={3}>

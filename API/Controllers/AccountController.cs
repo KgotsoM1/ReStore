@@ -1,5 +1,4 @@
-﻿using System;
-using API.Data;
+﻿using API.Data;
 using API.DTOs;
 using API.Entities;
 using API.Extensions;
@@ -24,34 +23,39 @@ public class AccountController : BaseApiController
         _userManager = userManager;
     }
 
-    [HttpPost("login")]
-    public async Task<ActionResult<UserDto>> Login(LoginDto loginDto)
+   [HttpPost("login")]
+public async Task<ActionResult<UserDto>> Login(LoginDto loginDto)
+{
+    var user = await _userManager.FindByNameAsync(loginDto.Username);
+    if (user == null || !await _userManager.CheckPasswordAsync(user, loginDto.Password))
+        return Unauthorized();
+
+    var userBasket = await RetrieveBasket(loginDto.Username);
+    var anonBasket = await RetrieveBasket(Request.Cookies["buyerId"]);
+
+    if (anonBasket != null)
     {
-        var user = await _userManager.FindByNameAsync(loginDto.Username);
-        if (user == null || !await _userManager.CheckPasswordAsync(user, loginDto.Password))
-            return Unauthorized();
-
-        var userBasket = await RetrieveBasket(loginDto.Username);
-        var anonBasket = await RetrieveBasket(Request.Cookies["buyerId"]);
-
-        if (anonBasket != null)
-        {
-            if (userBasket != null) _context.Baskets.Remove(userBasket);
-            anonBasket.BuyerId = user.UserName;
-            Response.Cookies.Delete("buyerId");
-            await _context.SaveChangesAsync();
-        }
-
-        return new UserDto
-        {
-            Email = user.Email,
-            Token = await _tokenService.GenerateToken(user),
-            Basket = anonBasket != null ? anonBasket.MapBasketToDto() : userBasket?.MapBasketToDto()
-        };
+        if (userBasket != null) _context.Baskets.Remove(userBasket);
+        anonBasket.BuyerId = user.UserName;
+        Response.Cookies.Delete("buyerId");
+    }
+    else if (userBasket == null)
+    {
+        userBasket = new Basket { BuyerId = user.UserName };
+        _context.Baskets.Add(userBasket);
     }
 
+    await _context.SaveChangesAsync();
+
+    return new UserDto
+    {
+        Email = user.Email,
+        Token = await _tokenService.GenerateToken(user),
+        Basket = anonBasket != null ? anonBasket.MapBasketToDto() : userBasket?.MapBasketToDto()
+    };
+}
     [HttpPost("register")]
-    public async Task<ActionResult> Register(RegisterDto registerDto)
+    public async Task<ActionResult> RegisterUser(RegisterDto registerDto)
     {
         var user = new User { UserName = registerDto.Username, Email = registerDto.Email };
 
@@ -87,8 +91,7 @@ public class AccountController : BaseApiController
             Basket = userBasket?.MapBasketToDto()
         };
     }
-
-    [Authorize]
+  [Authorize]
     [HttpGet("savedAddress")]
     public async Task<ActionResult<UserAddress>> GetSavedAddress()
     {
@@ -97,6 +100,7 @@ public class AccountController : BaseApiController
             .Select(user => user.Address)
             .FirstOrDefaultAsync();
     }
+
 
     private async Task<Basket> RetrieveBasket(string buyerId)
     {
