@@ -7,7 +7,7 @@ import { useAppDispatch } from '../../app/store/configureStore';
 import { setBasket } from '../basket/basketSlice';
 import LoadingComponent from "../../app/layout/LoadingCOmponent";
 
-const stripePromise = loadStripe('pk_test_51NyAuoEC6xY0kJuUzLTr6XXlHULBlNJb9f9MJfrsyceFm008XH8KvzATWlPK11181jMgqlYOm4Q7Sd5yHnuJpl5l00Ghzq3JiO');
+const stripePromise = loadStripe('pk_test_51P5gFwCiRwIcdtF4FLyFjZ8v1PYuVxRacxSVML2BVeGzpevVhYgvwI7sgejrUVZxLkHpmddFVbZgsYc0XPNKfKZs006hulLXQ5');
 
 export default function CheckoutWrapper() {
     const dispatch = useAppDispatch();
@@ -16,7 +16,7 @@ export default function CheckoutWrapper() {
     useEffect(() => {
         agent.Payments.createPaymentIntent()
             .then(basket => dispatch(setBasket(basket)))
-            .catch(error => console.log(error))
+            .catch(error => console.error(error))
             .finally(() => setLoading(false))
     }, [dispatch]);
 

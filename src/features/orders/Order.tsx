@@ -17,7 +17,7 @@ export default function Orders() {
         setLoading(true);
         agent.Orders.list()
             .then(orders => setOrders(orders))
-            .catch(error => console.log(error))
+            .catch(error => console.error(error))
             .finally(() => setLoading(false))
     }, []);
 

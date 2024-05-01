@@ -14,7 +14,6 @@ export default function Register() {
     });
 
     function handleApiErrors(errors: unknown) {
-        console.log(errors);
         if (Array.isArray(errors)) {
             errors.forEach((error: string) => {
                 if (error.includes('Password')) {

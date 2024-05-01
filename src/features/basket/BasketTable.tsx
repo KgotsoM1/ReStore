@@ -3,7 +3,7 @@ import { LoadingButton } from '@mui/lab';
 import { TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody, Box } from '@mui/material';
 import { BasketItem } from "../../app/models/basket";
 import { useAppSelector, useAppDispatch } from "../../app/store/configureStore";
-import { removeBasketItemAsync, addBasketItemAsync } from "./basketSlice";
+import { removeBasketItemAsync, addBasketItemAsync, fetchBasketAsync } from "./basketSlice";
 
 interface Props {
     items: BasketItem[];
@@ -53,13 +53,16 @@ export default function BasketTable({ items, isBasket = true }: Props) {
                                     </LoadingButton>}
                                 {item.quantity}
                                 {isBasket &&
-                                    <LoadingButton
-                                        loading={status === 'pendingAddItem' + item.productId}
-                                        onClick={() => dispatch(addBasketItemAsync({ productId: item.productId }))}
-                                        color='secondary'
-                                    >
-                                        <Add />
-                                    </LoadingButton>}
+                                   <LoadingButton
+                                   loading={status === 'pendingAddItem' + item.productId}
+                                   onClick={() => {
+                                       dispatch(addBasketItemAsync({ productId: item.productId }))
+                                           .then(() => dispatch(fetchBasketAsync()));
+                                   }}
+                                   color='secondary'
+                               >
+                                   <Add />
+                               </LoadingButton>}
                             </TableCell>
                             <TableCell align="right">${((item.price / 100) * item.quantity).toFixed(2)}</TableCell>
                             {isBasket &&

@@ -14,19 +14,15 @@ export default function Login() {
         mode: 'onTouched'
     });
 
-
     async function submitForm(data: FieldValues) {
-        console.table(data);
-          try {
+        try {
             await dispatch(signInUser(data));
             navigate(location.state?.from || '/catalog');
-          } catch(error) {
-            console.log(error)
-          }
-  
+        } catch (error) {
+            console.error(error);
+        }
+    }
 
-      
-  }
     return (
         <Container
             component={Paper}

@@ -1,27 +1,26 @@
 import { Container, CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 import Header from './Header';
-import {  useCallback, useEffect, useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { useCallback, useEffect, useState } from 'react';
+import { Outlet, useLocation } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import LoadingComponent from './LoadingCOmponent';
 import { useAppDispatch } from '../store/configureStore';
+import { fetchBasketAsync } from '../../features/basket/basketSlice';
 import { fetchCurrentUser } from '../../features/account/accountSlice';
 import HomePage from '../../features/home/HomePage';
-import { fetchBasketAsync } from '../../features/basket/basketSlice';
-
+import LoadingComponent from './LoadingCOmponent';
 
 function App() {
+  const location = useLocation();
   const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(true);
 
   const initApp = useCallback(async () => {
     try {
-      console.log("initApp");
       await dispatch(fetchCurrentUser());
       await dispatch(fetchBasketAsync());
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   }, [dispatch]);
 

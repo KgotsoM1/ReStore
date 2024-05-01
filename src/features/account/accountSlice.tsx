@@ -18,7 +18,6 @@ export const signInUser = createAsyncThunk<User, FieldValues>(
     'account/signInUser',
     async (data , thunkAPI) => {
         try {
-            console.log('Data', data);
             const userDto = await agent.Account.login(data);
             const {basket, ...user} = userDto;
             if (basket) thunkAPI.dispatch(setBasket(basket));
@@ -75,8 +74,8 @@ export const accountSlice = createSlice({
                 state.user = action.payload;
             });
         builder.addMatcher(isAnyOf(signInUser.rejected), (state, action) => {
-            console.log('State:', state);
-            console.log('Action payload:', action.payload);
+            console.warn('State:', state);
+            console.warn('Action payload:', action.payload);
         });
     }
 });

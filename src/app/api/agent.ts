@@ -87,13 +87,13 @@ const TestErrors = {
 
 const Basket = {
     get: () => requests.get('basket'),
-    addItem: (productId: number, quantity = 1) => requests.post(`/basket`, {productId, quantity}).then(x => x.value),
+    addItem: (productId: number, quantity = 1) => requests.post(`/basket`, {productId, quantity}),
     removeItem: (productId: number, quantity = 1) => requests.delete(`basket?productId=${productId}&quantity=${quantity}`),
 };
 
 const Account = {
-    login: (values: FieldValues) => requests.post('account/login', values),
-    register: (values: FieldValues) => requests.post('account/register', values),
+    login: (values: any) => requests.post('account/login', values),
+    register: (values: any) => requests.post('account/register', values),
     currentUser: () => requests.get('account/currentUser'),
     fetchAddress: () => requests.get('account/savedAddress')
 };
