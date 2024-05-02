@@ -4,6 +4,7 @@ using API.Entities;
 using API.DTOs;
 using API.Extensions;
 using API.RequestHelpers;
+using API.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
@@ -17,10 +18,12 @@ namespace API.Controllers
     {
         private readonly StoreContext _context;
         private readonly IMapper _mapper;
-        public ProductsController(StoreContext context, IMapper mapper)
+        private readonly ImageService _imageService;
+        public ProductsController(StoreContext context, IMapper mapper, ImageService imageService)
         {
-            _mapper = mapper;
+            _imageService = imageService;
             _context = context;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -60,9 +63,23 @@ namespace API.Controllers
         }
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<ActionResult<Product>> CreateProduct(CreateProductDto productDto)
+        public async Task<ActionResult<Product>> CreateProduct([FromForm] CreateProductDto productDto)
         {
             var product = _mapper.Map<Product>(productDto);
+
+            if (productDto.File != null)
+            {
+                var uploadResult = await _imageService.AddPhotoAsync(productDto.File);
+
+                if (uploadResult.Error != null)
+                    return BadRequest(new ProblemDetails { Title = uploadResult.Error.Message });
+
+                product.PictureUrl = uploadResult.SecureUrl.ToString();
+                product.PublicId = uploadResult.PublicId;
+
+
+            }
+
             _context.Products.Add(product);
 
             var result = await _context.SaveChangesAsync() > 0;
@@ -86,6 +103,25 @@ namespace API.Controllers
             if (product == null) return NotFound();
 
             _mapper.Map(productDto, product);
+     
+            if (productDto.File != null)
+            {
+                var uploadResult = await _imageService.AddPhotoAsync(productDto.File);
+
+                if (uploadResult.Error != null)
+                    return BadRequest(new ProblemDetails { Title = uploadResult.Error.Message });
+
+                if (!string.IsNullOrEmpty(product.PublicId))
+                {
+                    var deletionResult = await _imageService.DeletePhotoAsync(product.PublicId);
+
+                    if (deletionResult.Error != null)
+                        return BadRequest(new ProblemDetails { Title = deletionResult.Error.Message });
+                }
+                product.PictureUrl = uploadResult.SecureUrl.ToString();
+                product.PublicId = uploadResult.PublicId;
+            }
+
             var result = await _context.SaveChangesAsync() > 0;
 
             if (result) return NoContent();
@@ -99,7 +135,16 @@ namespace API.Controllers
         {
             var product = await _context.Products.FindAsync(id);
 
+         
             if (product == null) return NotFound();
+
+               if (!string.IsNullOrEmpty(product.PublicId))
+                {
+                    var deletionResult = await _imageService.DeletePhotoAsync(product.PublicId);
+
+                    if (deletionResult.Error != null)
+                        return BadRequest(new ProblemDetails { Title = deletionResult.Error.Message });
+                }
 
             _context.Products.Remove(product);
 

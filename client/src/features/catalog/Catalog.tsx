@@ -1,21 +1,18 @@
-import { useEffect } from "react";
 import ProductList from "./ProductList";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  fetchFilters,
-  fetchProductsAsync,
-  productSelectors,
   setPageNumber,
   setProductParams,
 } from "./catalogSlice";
-import { AnyAction } from "redux";
-import { RootState, useAppSelector } from "../../app/store/configureStore";
+
+import { RootState } from "../../app/store/configureStore";
 import { FormControl, Grid, Paper } from "@mui/material";
 import ProductSearch from "./ProductSearch";
 import RadioButtonGroup from "../../app/components/RadioGroupButton";
 import CheckboxButtons from "../../app/components/CheckBoxButtons";
 import AppPagination from "../../app/components/AppPagination";
 import LoadingComponent from "../../app/layout/LoadingCOmponent";
+import useProducts from "../../app/hooks/useProducts";
 
 const sortOptions = [
   { value: "name", label: "Alphabetical" },
@@ -24,28 +21,11 @@ const sortOptions = [
 ];
 
 export default function Catalog() {
-  const products = useAppSelector(productSelectors.selectAll);
+  const {products, brands, types, metaData, filtersLoaded} = useProducts();
   const dispatch = useDispatch();
-  const {
-    productsLoaded,
-    filtersLoaded,
-    brands,
-    types,
-    productParams,
-    metaData,
-  } = useSelector((state: RootState) => state.catalog);
+  const {productParams} = useSelector((state: RootState) => state.catalog);
 
-  useEffect(() => {
-    if (!productsLoaded) {
-      dispatch(fetchProductsAsync() as unknown as AnyAction);
-    }
-  }, [dispatch, productsLoaded]);
 
-  useEffect(() => {
-    if (!filtersLoaded) {
-      dispatch(fetchFilters() as unknown as AnyAction);
-    }
-  }, [dispatch, filtersLoaded]);
 
   if (!filtersLoaded) return <LoadingComponent message="Loading product..." />;
 

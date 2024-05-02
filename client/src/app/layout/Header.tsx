@@ -34,7 +34,7 @@ interface Props {
 
 export default function Header({ handleThemeChange, darkMode }: Props) {
     const { basket } = useAppSelector(state => state.basket);
-    const {user} = useAppSelector(state => state.account)
+    const { user } = useAppSelector(state => state.account);
     const itemCount = basket?.items.reduce((sum, item) => sum + item.quantity, 0);
 
     return (
@@ -63,7 +63,14 @@ export default function Header({ handleThemeChange, darkMode }: Props) {
                             {title.toUpperCase()}
                         </ListItem>
                     ))}
-                   
+                    {user && user.roles?.includes('Admin') &&
+                    <ListItem
+                        component={NavLink}
+                        to={'/inventory'}
+                        sx={navLinkStyles}
+                    >
+                        INVENTORY
+                    </ListItem>}
                 </List>
 
                 <Box display='flex' alignItems='center'>
@@ -87,8 +94,8 @@ export default function Header({ handleThemeChange, darkMode }: Props) {
                                 </ListItem>
                             ))}
                         </List>
-                    )}     
-               
+                    )}
+
                 </Box>
 
             </Toolbar>
