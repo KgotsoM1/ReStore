@@ -52,6 +52,9 @@ axios.interceptors.response.use(
                         toast.error(errorTitle);
                         break;
                     }
+                    case 403:
+                        toast.error('You are not allowed to do that!');
+                        break;
                     case 500:
                         router.navigate('/server-error', { state: { error: data } });
                         break;
@@ -69,6 +72,16 @@ const requests = {
     post: (url: string, body: object) => axios.post(url, body).then(responseBody),
     put: (url: string, body: object) => axios.put(url, body).then(responseBody),
     delete: (url: string) => axios.delete(url).then(responseBody),
+    postForm: (url: string, formData: FormData) => axios.post(url, formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    }).then(responseBody),
+    putForm: (url: string, formData: FormData) => axios.put(url, formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    }).then(responseBody),
 };
 
 const Catalog = {
@@ -108,13 +121,28 @@ const Payments = {
     createPaymentIntent: () => requests.post('payments', {})
 }
 
+function createFormData(item: any) {
+    const formData = new FormData();
+    for (const key in item) {
+        formData.append(key, item[key])
+    }
+    return formData;
+}
+
+const Admin = {
+    createProduct: (product: any) => requests.postForm('products', createFormData(product)),
+    updateProduct: (product: any) => requests.putForm('products', createFormData(product)),
+    deleteProduct: (id: number) => requests.delete(`products/${id}`)
+}
+
 const agent = {
     Catalog,
     TestErrors,
     Basket,
     Account,
     Orders,
-    Payments
+    Payments,
+    Admin
 };
 
 export default agent;
